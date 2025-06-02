@@ -1,12 +1,12 @@
 import ErrorMessage from "../ErrorMessage/ErrorMessage"
 import MovieModal from "../MovieModal/MovieModal"
 import SearchBar from "../SearchBar/SearchBar"
-import { useQuery } from "@tanstack/react-query"
+import { keepPreviousData, useQuery } from "@tanstack/react-query"
 import Loader from "../Loader/Loader"
 import { useEffect, useState } from "react"
 import MovieGrid from "../MovieGrid/MovieGrid"
 import toast, { Toaster } from "react-hot-toast"
-import type Movie from "../../types/movie"
+import type { Movie } from "../../types/movie"
 import { fetchQuery } from "../../services/movieService"
 import ReactPaginate from 'react-paginate';
 import css from "./App.module.css"
@@ -27,10 +27,11 @@ export default function App(){
     const [isOpen, setIsOpen] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     
-    const {data, isError, isLoading, isFetched} = useQuery<MovieResponse>({
+    const {data, isError, isLoading, isSuccess} = useQuery<MovieResponse>({
         queryKey: ["myQueryKey", searchValue, currentPage],
         queryFn:() => fetchQuery(searchValue, currentPage),
         enabled: !!searchValue,
+        placeholderData: keepPreviousData
     })
     
     function handleGet(value: string): void {
@@ -39,12 +40,9 @@ export default function App(){
     }
 
     useEffect(()=>
-        {
-        if(isFetched&&searchValue.trim() == ""){
-            toast.error("Please enter your search query.")
-        }else if(data?.results.length === 0){
+        {if(data?.results.length === 0){
             toast.error("No movies found for your request.")}
-        },[data, searchValue, isFetched]);
+        },[data]);
 
         function openModal(movie: Movie) {
             setIsOpen(true)
@@ -61,7 +59,7 @@ export default function App(){
         <SearchBar onSubmit={handleGet}/>
         {isError && <ErrorMessage/>}
         {isLoading && <Loader/>}
-        {data?.results && <MovieGrid onSelect={openModal} movies={data.results}/> }
+        {isSuccess && data?.results && <MovieGrid onSelect={openModal} movies={data.results}/> }
         {selectedMovie && isOpen && <MovieModal movie={selectedMovie} onClose={closeModal}/>}
         {typeof data?.total_pages === 'number' && data?.total_pages > 1 && !(isError) &&<ReactPaginate 
         pageCount={Math.ceil(data?.total_pages)}

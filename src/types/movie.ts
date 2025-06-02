@@ -1,4 +1,4 @@
-export default interface Movie{
+export interface Movie{
     id: number;
     poster_path: string;
     backdrop_path: string;
@@ -7,3 +7,4 @@ export default interface Movie{
     release_date: string;
     vote_average: number;
 }
+
