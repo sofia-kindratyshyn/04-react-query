@@ -7,7 +7,7 @@ import { useEffect, useState } from "react"
 import MovieGrid from "../MovieGrid/MovieGrid"
 import toast, { Toaster } from "react-hot-toast"
 import type Movie from "../../types/movie"
-import { fetchQuery } from "../../service/movieService"
+import { fetchQuery } from "../../services/movieService"
 import ReactPaginate from 'react-paginate';
 import css from "./App.module.css"
 
