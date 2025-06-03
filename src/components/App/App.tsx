@@ -24,7 +24,6 @@ interface MovieResponse {
 export default function App(){
     const [searchValue, setSearchValue] = useState("")
     const [selectedMovie, setSelectedMovie] = useState<MovieObj>(null)
-    const [isOpen, setIsOpen] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     
     const {data, isError, isLoading, isSuccess} = useQuery<MovieResponse>({
@@ -40,17 +39,15 @@ export default function App(){
     }
 
     useEffect(()=>
-        {if(data?.results.length === 0){
+        {if(isSuccess && data?.results.length === 0){
             toast.error("No movies found for your request.")}
-        },[data]);
+        },[data, isSuccess]);
 
         function openModal(movie: Movie) {
-            setIsOpen(true)
             setSelectedMovie(movie)
         }
 
         function closeModal() {
-          setIsOpen(false);
           setSelectedMovie(null)}
     
     return(
@@ -60,9 +57,9 @@ export default function App(){
         {isError && <ErrorMessage/>}
         {isLoading && <Loader/>}
         {isSuccess && data?.results && <MovieGrid onSelect={openModal} movies={data.results}/> }
-        {selectedMovie && isOpen && <MovieModal movie={selectedMovie} onClose={closeModal}/>}
+        {selectedMovie && <MovieModal movie={selectedMovie} onClose={closeModal}/>}
         {typeof data?.total_pages === 'number' && data?.total_pages > 1 && !(isError) &&<ReactPaginate 
-        pageCount={Math.ceil(data?.total_pages)}
+        pageCount={(data?.total_pages)}
         pageRangeDisplayed={5}
         marginPagesDisplayed={1}
         onPageChange={({ selected }) => setCurrentPage(selected + 1)}

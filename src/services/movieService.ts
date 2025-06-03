@@ -6,12 +6,12 @@ interface MovieResponse {
 }
 
 export const fetchQuery = async (value: string, page: number): Promise<MovieResponse> => {
-    const responce = await axios.get(`https://api.themoviedb.org/3/search/movie?query=${value}&page=${page}`,
+    const response = await axios.get<MovieResponse>(`https://api.themoviedb.org/3/search/movie?query=${value}&page=${page}`,
     {
         headers: {
         Authorization: `Bearer ${import.meta.env.VITE_TMDB_TOKEN}`
     }}
   )
-  return responce.data;
+  return response.data;
   
 }
